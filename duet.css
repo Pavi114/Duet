@@ -1,0 +1,41 @@
+body {
+	background-image: url("https://motionarray.imgix.net/preview-75767-9UDERjFR2N-low_0007.jpg?w=660&q=60&fit=max&auto=format");
+	background-position: center;
+	background-size: cover;
+	color: #FFFFFF;
+	font-family: "Ubuntu";
+	font-size: 35px;
+}
+button {
+	background-color: #555555;
+	box-shadow: 2px 2px 1px #999999;
+	border-radius: 2px;
+	padding: 5px;
+	font-size: 50px;
+	margin: 70px;
+
+}
+
+canvas {
+	margin-left: 1300px;
+	margin-top: 150px;
+	border: 4px solid white;
+}
+
+.row {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+}
+
+#score{
+	border: 2px solid white;
+	padding: 10px;
+	text-align: center;
+	margin-left: 1300px;
+	margin-right: 1300px;
+}
+
+#play {
+	margin-left: 2000px;
+}
