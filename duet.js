@@ -3,8 +3,9 @@ var resume = document.querySelector("#resume");
 var reset = document.querySelector("#restart");
 // var multi = document.querySelector("#multi");
 var li = document.createElement("LI");
+var color = ["#f0e310","#000080","#FE77FE"];
 var time = 0;
-var bCircle,circleBlue,circleRed,score,boostTime,start_time,vy,curr_score,obstacles,game,title,scoreList = [],pauseTime,resumeTime,power,rotAngle,powerBoost,n,pausedGame;
+var bCircle,circleBlue,circleRed,score,boostTime,flightTime,start_time,vy,curr_score,obstacles,game,title,scoreList = [],pauseTime,resumeTime,power,rotAngle,powerBoost,flight,n,pausedGame,affection,affOuter;
 
 startScreen();
 
@@ -27,7 +28,9 @@ class newComponent{
 			ctx.beginPath();
 			ctx.arc(this.x,this.y,this.radius,0,2*Math.PI);
 			ctx.strokeStyle = "rgba(0, 200, 255, 0.5)";
-			ctx.lineWidth = "2";
+			ctx.lineWidth = "4";
+			ctx.shadowBlur = 20;
+			ctx.shadowColor = "white";
 			ctx.stroke();
 			ctx.closePath();
 		}
@@ -37,6 +40,8 @@ class newComponent{
 			ctx.beginPath();
 			ctx.arc(this.x,this.y,this.radius,0,2*Math.PI);
 			ctx.fillStyle = this.color;
+			ctx.shadowBlur = 20;
+			ctx.shadowColor = "white";
 			ctx.fill();
 			ctx.closePath();
 		}
@@ -45,25 +50,47 @@ class newComponent{
 			ctx.beginPath();
 			ctx.fillStyle = this.color;
 			ctx.font = "60px Consolas";
+			ctx.shadowBlur = 20;
+			ctx.shadowColor = "#71c7ec";
 			ctx.fillText(this.text,this.x,this.y);
 			ctx.closePath();
 		}
 		else if(this.type == "horlicks"){
 			var ctx = game.context;
+			ctx.shadowBlur = 0;
+			ctx.shadowColor = "black";
 			var img = new Image();
 			img.src = "horlicksmod.jpg"
 			ctx.drawImage(img,0,0,60,60,this.x,this.y,60,60);
 		}
 		else if(this.type == "flight"){
 			var ctx = game.context;
+			ctx.shadowBlur = 0;
+			ctx.shadowColor = "black";
 			var img = new Image();
 			img.src = "flightmod.jpg";
 			ctx.drawImage(img,30,30,60,60,this.x,this.y,60,60);
+		}
+		else if(this.type == "affection"){
+			var ctx = game.context;
+			ctx.fillStyle = this.color;
+			ctx.rect(this.x,this.y,this.width,this.height);
+			ctx.fill();
+		}
+		else if(this.type == "bar"){
+			var ctx = game.context;
+			ctx.strokeStyle = "#FFFFFF";
+			ctx.shadowBlur = 20;
+			ctx.shadowColor = "#FFFFFF";
+			ctx.rect(this.x,this.y,this.width,this.height);
+			ctx.stroke();
 		}
 		else{
 			var ctx = game.context;
 			ctx.beginPath();
 			ctx.fillStyle = this.color;
+			ctx.shadowBlur = 20;
+			ctx.shadowColor = this.color;
 			this.y += this.vy;
 			ctx.rect(this.x,this.y,this.width,this.height);
 			ctx.fill();	
@@ -102,15 +129,19 @@ function startGame(){
 	bCircle = new newComponent(900,1200,0,0,"","bcircle",200);
 	circleRed = new newComponent(700,1200,0,0,"red","circle",40);
 	circleBlue = new newComponent(1100,1200,0,0,"blue","circle",40);
-	score = new newComponent(1500,40,0,0,"white","score");
-	title = new newComponent(900,40,0,0,"white","score");
+	score = new newComponent(1300,50,0,0,"white","score");
+	title = new newComponent(900,80,0,0,"white","score");
+	affOuter = new newComponent(300,50,400,30,"","bar");
+	affection = new newComponent(300,50,0,0,"#d74f6b","affection");
 	resumeTime = 0;
 	pauseTime = 0;
 	time_elaspse = 0;
 	powerBoost = false;
 	numR = 0;
 	rotAngle = 2;
-	boostTime = 0;
+	boostTime = 9999999999999;
+	flightTime = 0;
+	flight = false;
 	obstacles = [];
 	power = [];
 	pausedGame = false;
@@ -165,73 +196,74 @@ function initialScore(){
 function updateGame(){
 	if(!pausedGame){
 		if(!powerBoost){
-			for(var i = 0;i<obstacles.length;i++){
-				if(circleRed.crash(obstacles[i]) || circleBlue.crash(obstacles[i])){
-					game.res();
+			// for(var i = 0;i<obstacles.length;i++){
+			// 	if(circleRed.crash(obstacles[i]) || circleBlue.crash(obstacles[i])){
+			// 		game.res();
 
-					crashText();
+			// 		crashText();
 
-					obstacles = [];
-					power = [];
+			// 		obstacles = [];
+			// 		power = [];
 
-					scoreList.push(curr_score);
-					scoreList.sort(function(a,b){return (b - a)});
+			// 		scoreList.push(curr_score);
+			// 		scoreList.sort(function(a,b){return (b - a)});
 
-					game = undefined;
+			// 		game = undefined;
 
-					cancelAnimationFrame(id);
+			// 		cancelAnimationFrame(id);
 
-					document.onkeypress = function(event){
-						gameArea();
-						startGame();
-						document.body.removeChild(document.body.lastChild);
-					}
+			// 		document.onkeypress = function(event){
+			// 			gameArea();
+			// 			startGame();
+			// 			document.body.removeChild(document.body.lastChild);
+			// 		}
 
-					return;
-				}
-			}
+			// 		return;
+			// 	}
+			// }
+
+			
 		}
 
-		for(var j = 0;j<power.length;j++){
-			if(circleBlue.crash(power[j])){
-				if(power[j].type == "flight"){
-					rotAngle += 1;
-					// console.log("phew");
-					// console.log(power.length);
-
-				}
-				else if(power[j].type == "horlicks"){
-					powerBoost = true;
-					circleBlue.radius *= 2;
-					boostTime = Date.now();
-				}
-				break;
-			}
-
-		}
+		crashPower();
 
 		game.res();
 
 		bCircle.update();
 		circleBlue.update();
 		circleRed.update();
+		affOuter.update();
 		title.text = "DUET";
 		title.update();
 
 		game.frameNo += 1;
 
-
+        
 		var timeNow = Date.now();
-		if(timeNow - boostTime > 5000){
-			powerBoost = false;
-		}
+		// if(timeNow - boostTime > 5000){
+		// 	powerBoost = false;
+		// 	circleBlue.radius = 40;
+		// 	circleBlue.update();
+		// 	boostTime = 99999999999999;
+		// }
+
+
+
+		//flight over
+		if(timeNow - flightTime > 5000 && flight){
+			rotAngle = 2;
+			flight = false;
+
+     	}
+		
+		
 
 
         //increase speed of obstacles with number of frames
 		if(everyinterval(n*3)){
 			vy += 0.5;
 			if(n > 70){
-				n-=50;
+				n-=30;
 			}
 			for (var i = 0; i < obstacles.length; i += 1) {
 				obstacles[i].vy += vy;
@@ -243,7 +275,7 @@ function updateGame(){
 
          //drop power boosts 
 		if(curr_score > 10){
-			if(everyinterval(n*4)){
+			if(everyinterval(n*5)){
 
 				powBoost();
 			}
@@ -269,7 +301,31 @@ function updateGame(){
 	}
 }
 
+// function affectionMeter(){
+// 	if(score)
+// }
 
+function crashPower(){
+	for(var j = 0;j<power.length;j++){
+			if(circleBlue.crash(power[j])){
+				if(power[j].type == "flight"){
+					rotAngle += 1;
+					flightTime = Date.now();
+					flight = true;
+					// console.log("phew");
+					// console.log(power.length);
+
+				}
+				else if(power[j].type == "horlicks"){
+					powerBoost = true;
+					circleBlue.radius *= 2;
+					boostTime = Date.now();
+				}
+			  break;
+			}
+
+		}
+}
 
 function newOb(){
 	var minWidth = 60;
@@ -278,8 +334,9 @@ function newOb(){
 	var maxHeight = 150;
 	var width = Math.floor(Math.random()*(maxWidth-minWidth+1) + minWidth);
 	var height = Math.floor(Math.random()*(maxHeight-minHeight+1) + minHeight);
-	var x = Math.floor(Math.random()*(game.canvas.width - 300) + 300);
-	obstacles.push(new newComponent(x,0,width,height,"yellow","",0,vy));		
+	var x = Math.floor(Math.random()*(game.canvas.width - 1200) + 300);
+	var colorBlock = color[Math.floor(Math.random() * 3)];
+	obstacles.push(new newComponent(x,0,width,height,colorBlock,"",0,vy));		
 }
 
 function everyinterval(n) {
@@ -315,8 +372,9 @@ function powBoost(){
 	var maxHeight = 150;
 	var width = Math.floor(Math.random()*(maxWidth-minWidth+1) + minWidth);
 	var height = Math.floor(Math.random()*(maxHeight-minHeight+1) + minHeight);
-	var x = Math.floor(Math.random()*(200) + 600);
+	var x = Math.floor(Math.random()*(400) + 600);
 	var rand = Math.floor(Math.random()*2 + 1);
+	rand = 2;
 	if(rand == 1){
 		power.push(new newComponent(x,0,width,height,"","horlicks",0,vy));
 
@@ -393,7 +451,7 @@ function startScreen(){
 	var ctx = game.context;
 	ctx.save();
 	ctx.fillStyle = "rgba(255,255,255,0.5)";
-	ctx.fillRect(0,0,game.canvas.width*0.2,game.canvas.height*0.2);
+	ctx.fillRect(0,0,game.canvas.width*0.2,game.canvas.height);
 
 	ctx.font = "40px Consolas"
 	ctx.fillText("Welcome To Duet",200,100);
