@@ -159,13 +159,13 @@ startScreen();
 
 function startGame(){
 
-	bCircle = new newComponent(900,1200,0,0,"","bcircle",200);
-	circleRed = new newComponent(700,1200,0,0,"red","circle",40);
-	circleBlue = new newComponent(1100,1200,0,0,"blue","circle",40);
-	score = new newComponent(1300,50,0,0,"white","score");
-	title = new newComponent(900,80,0,0,"white","score");
-	affOuter = new newComponent(300,50,400,30,"","bar");
-	affection = new newComponent(300,50,0,30,"#d74f6b","affection");
+	bCircle = new newComponent(game.canvas.width/2,game.canvas.height - 300,0,0,"","bcircle",200);
+	circleRed = new newComponent(game.canvas.width/2 - 200,game.canvas.height - 300,0,0,"red","circle",40);
+	circleBlue = new newComponent(game.canvas.width/2 + 200,game.canvas.height - 300,0,0,"blue","circle",40);
+	score = new newComponent(game.canvas.width - 400,50,0,0,"white","score");
+	title = new newComponent(700,50,0,0,"white","score")
+	affOuter = new newComponent(200,50,400,30,"","bar");
+	affection = new newComponent(200,50,0,30,"#d74f6b","affection");
 	resumeTime = 0;
 	pauseTime = 0;
 	time_elaspse = 0;
@@ -196,7 +196,7 @@ function startGame(){
 	}
 
     //initial obstacles
-    for(var i = 0;i < 5 ;i++)
+    for(var i = 0;i < 3 ;i++)
     	newOb();
 
 	//multiplayer mode
@@ -219,8 +219,8 @@ function gameArea(){
 	game = {
 		canvas: document.querySelector("#canvas"),
 		start: function(){
-			this.canvas.width = 1800;
-			this.canvas.height = 1600;
+			this.canvas.width = window.innerWidth * 0.4;
+			this.canvas.height = window.innerHeight * 0.8;
 			this.context = this.canvas.getContext("2d"); 
 			this.canvas.fillStyle = "black";
 			this.frameNo = 0;
@@ -405,10 +405,10 @@ function updateGame(){
          
          //affection time over
          if(Date.now() - collideTime > 10000 && collide){
-         	circleRed.x = 700;
-         	circleRed.y = 1200;
-         	circleBlue.x = 1100;
-         	circleBlue.y = 1200;
+         	circleRed.x = game.canvas.width/2 + 200;
+         	circleRed.y = game.canvas.height - 300;
+         	circleBlue.x = game.canvas.width/2 - 200;
+         	circleBlue.y = game.canvas.height - 300;
          	circleRed.color = "red";
          	collide = false;
          }
@@ -423,7 +423,7 @@ function updateGame(){
          //rotating obstacles
          for (i = 0; i < obstacles.length; i += 1) {
          	if(curr_score >= 50){
-         		obstacles[i].angle += 0.5;	
+         		obstacles[i].angle += 0.7;	
          	}
          	obstacles[i].y += obstacles[i].vy;
          	obstacles[i].update();
@@ -484,14 +484,14 @@ function powerText(){
 
 
 function newOb(){
-	var minWidth = 60;
-	var maxWidth = 250;
-	var minHeight = 60;
-	var maxHeight = 80;
+	var minWidth = 70;
+	var maxWidth = 230;
+	var minHeight = 50;
+	var maxHeight = 70;
 	var width = Math.floor(Math.random()*(maxWidth-minWidth+1) + minWidth);
 	var height = Math.floor(Math.random()*(maxHeight-minHeight+1) + minHeight);
-	var x = Math.floor(Math.random()*(game.canvas.width - 300) + 150);
-	var y = Math.floor(Math.random()*(game.canvas.height/2 - 500));
+	var x = Math.floor(Math.random()*(game.canvas.width - 600) + 300);
+	var y = Math.floor(Math.random()*(game.canvas.height * 0.1));
 	var colorBlock = color[Math.floor(Math.random() * 3)];
 	var overlapped = overlap(x,y,width,height);
 
@@ -506,13 +506,13 @@ function newOb(){
 
 function resetOb(pos){
 	var minWidth = 60;
-	var maxWidth = 270;
-	var minHeight = 60;
-	var maxHeight = 90;
+	var maxWidth = 200;
+	var minHeight = 50;
+	var maxHeight = 70;
 	var width = Math.floor(Math.random()*(maxWidth-minWidth+1) + minWidth);
 	var height = Math.floor(Math.random()*(maxHeight-minHeight+1) + minHeight);
-	var x = Math.floor(Math.random()*(game.canvas.width - 300) + 150);
-	var y = Math.floor(Math.random()*(game.canvas.height/2 - 500));
+	var x = Math.floor(Math.random()*(game.canvas.width - 600) + 300);
+	var y = Math.floor(Math.random()*(game.canvas.height * 0.1));
 	var colorBlock = color[Math.floor(Math.random() * 3)];
 	var overlapped = overlap(x,y,width,height);
 
@@ -549,7 +549,7 @@ function powBoost(){
 	var maxHeight = 150;
 	var width = Math.floor(Math.random()*(maxWidth-minWidth+1) + minWidth);
 	var height = Math.floor(Math.random()*(maxHeight-minHeight+1) + minHeight);
-	var x = Math.floor(Math.random()*(500) + 400);
+	var x = Math.floor(Math.random()*(game.canvas.width - 700) + 400);
 	var rand = Math.floor(Math.random()*2 + 1);
 	if(rand == 1){
 		power.push(new newComponent(x,0,width,height,"","horlicks",0,2));
@@ -573,15 +573,15 @@ document.onkeydown = function(event){
 
 		if(!collide){
 			circleBlue.x = game.canvas.width/2 + bCircle.radius * Math.cos(2 * circleBlue.radians);
-			circleBlue.y = game.canvas.height - 400 + bCircle.radius * Math.sin(2 * circleBlue.radians);
+			circleBlue.y = game.canvas.height - 300 + bCircle.radius * Math.sin(2 * circleBlue.radians);
 			circleRed.x = game.canvas.width/2 - bCircle.radius * Math.cos(2 * circleRed.radians);
-			circleRed.y = game.canvas.height - 400 - bCircle.radius * Math.sin(2 * circleRed.radians);  
+			circleRed.y = game.canvas.height - 300 - bCircle.radius * Math.sin(2 * circleRed.radians);  
 		}
 		else{
 			circleBlue.x = game.canvas.width/2 + bCircle.radius * Math.cos(2 * circleBlue.radians);
-			circleBlue.y = game.canvas.height - 400 + bCircle.radius * Math.sin(2 * circleBlue.radians);
+			circleBlue.y = game.canvas.height - 300 + bCircle.radius * Math.sin(2 * circleBlue.radians);
 			circleRed.x = game.canvas.width/2 + bCircle.radius * Math.cos(2 * circleRed.radians);
-			circleRed.y = game.canvas.height - 400 + bCircle.radius * Math.sin(2 * circleRed.radians);  
+			circleRed.y = game.canvas.height - 300 + bCircle.radius * Math.sin(2 * circleRed.radians);  
 		}
 
 
@@ -603,14 +603,14 @@ document.onkeydown = function(event){
 		if(!collide){
 
 			circleBlue.x = game.canvas.width/2 + bCircle.radius * Math.cos(2 * circleBlue.radians);
-			circleBlue.y = game.canvas.height - 400 + bCircle.radius * Math.sin(2 * circleBlue.radians);
+			circleBlue.y = game.canvas.height - 300 + bCircle.radius * Math.sin(2 * circleBlue.radians);
 			circleRed.x = game.canvas.width/2 - bCircle.radius * Math.cos(2 * circleRed.radians);
-			circleRed.y = game.canvas.height - 400 - bCircle.radius * Math.sin(2 * circleRed.radians);	
+			circleRed.y = game.canvas.height - 300 - bCircle.radius * Math.sin(2 * circleRed.radians);	
 		}else{
 			circleBlue.x = game.canvas.width/2 + bCircle.radius * Math.cos(2 * circleBlue.radians);
-			circleBlue.y = game.canvas.height - 400 + bCircle.radius * Math.sin(2 * circleBlue.radians);
+			circleBlue.y = game.canvas.height - 300 + bCircle.radius * Math.sin(2 * circleBlue.radians);
 			circleRed.x = game.canvas.width/2 + bCircle.radius * Math.cos(2 * circleRed.radians);
-			circleRed.y = game.canvas.height - 400 + bCircle.radius * Math.sin(2 * circleRed.radians);
+			circleRed.y = game.canvas.height - 300 + bCircle.radius * Math.sin(2 * circleRed.radians);
 		}
 		
 		
@@ -673,30 +673,29 @@ document.onkeydown = function(event){
 	function startScreen(){
 		gameArea();
 		var ctx = game.context;
-		ctx.save();
+
 		ctx.fillStyle = "rgba(255,255,255,0.5)";
 		ctx.fillRect(0,0,game.canvas.width*0.2,game.canvas.height);
 
 		ctx.font = "40px Consolas"
-		ctx.fillText("Welcome To Duet",200,100);
+		ctx.fillText("Welcome To Duet",100,100);
 
 		ctx.font = "30px Consolas";
-		ctx.fillText("With the arrival of long, lazy days and light, balmy evenings of the summer months,",200,200);
-		ctx.fillText("Rishavhas decided to give in to the new trend of freckling, or as most would call it, summer fling.",200,240);
-		ctx.fillText("He's heads over heels for this girl named Phoebe, but she's franticallyrunning away, ",200,280); 
-		ctx.fillText("always making sure that she's at a constant distance from him.",200,320);
-		ctx.fillText("Help him get his girl.",200,360);
+		ctx.fillText("With the arrival of long, lazy days and light, balmy evenings of the summer months,",100,200);
+		ctx.fillText("Rishavhas decided to give in to the new trend of freckling, or as most would call it, summer fling.",100,240);
+		ctx.fillText("He's heads over heels for this girl named Phoebe, but she's franticallyrunning away, ",100,280); 
+		ctx.fillText("always making sure that she's at a constant distance from him.",100,320);
+		ctx.fillText("Help him get his girl.",100,360);
 
 		ctx.font = "35px Consolas";
-		ctx.fillText("Instruction: ",200,500);
-		ctx.fillText("Use Arrow Keys (left and right) to rotate and escape the obstacles",200,550);
-		ctx.fillText("Press P to Pause",200,600);
-		ctx.fillText("Press R to Resume",200,650);
-		ctx.fillText("Press E to Restart",200,700);
+		ctx.fillText("Instruction: ",100,500);
+		ctx.fillText("Use Arrow Keys (left and right) to rotate and escape the obstacles",100,550);
+		ctx.fillText("Press P to Pause",100,600);
+		ctx.fillText("Press R to Resume",100,650);
+		ctx.fillText("Press E to Restart",100,700);
 
-		ctx.fillText("Press M for Multiplayer",200,900);
-		ctx.fillText("Press S for Single Player",200,1000);
-
+		ctx.fillText("Press M for Multiplayer",100,900);
+		ctx.fillText("Press S for Single Player",100,1000);
 	}
 
 
@@ -708,7 +707,7 @@ document.onkeydown = function(event){
 		ctx.fillRect(0,0,game.canvas.width*0.2,game.canvas.height);
 
 
-		score.x = 800;
+		score.x = 200;
 		score.y = 500;
 		score.text = "SCORE:" + curr_score;
 		score.update();
@@ -737,7 +736,7 @@ document.onkeydown = function(event){
 
 		game.context.fillStyle = "rgba(255,255,255,0.3)";
 		game.context.font = "40px Consolas"
-		game.context.fillText("Press Any Key to Play Again",800,1200);	
+		game.context.fillText("Press Any Key to Play Again",200,1200);	
 	}
 
 	function multiText(){
@@ -750,7 +749,7 @@ document.onkeydown = function(event){
 
 		document.querySelector("#score").classList.add("hidden");
 
-		score.x = 800;
+		score.x = 200;
 		score.y = 700;
 		score.text = "Your Score: " + curr_score;
 		score.update();
@@ -758,11 +757,11 @@ document.onkeydown = function(event){
 		if(flag == 1){
 			game.context.fillStyle = "rgba(255,255,255,0.3)";
 			game.context.font = "60px Consolas"
-			game.context.fillText("B's Turn. Press Any Key to Play",600,1000);
+			game.context.fillText("B's Turn. Press Any Key to Play",200,1000);
 			flag = 0;
 		}
 		else{
-			score.x = 800;
+			score.x = 200;
 			score.y = 800;
 			score.text = "Your Opponent's Score: " + scoreA;
 			score.update();
@@ -770,12 +769,12 @@ document.onkeydown = function(event){
 			if(scoreA >= scoreB){
 				game.context.fillStyle = "rgba(255,255,255,0.3)";
 				game.context.font = "60px Consolas"
-				game.context.fillText("Oops! Your opponent won",600,1000);
+				game.context.fillText("Oops! Your opponent won",300,1000);
 			}
 			else {
 				game.context.fillStyle = "rgba(255,255,255,0.3)";
 				game.context.font = "60px Consolas"
-				game.context.fillText("Yayy You Won",800,1200);
+				game.context.fillText("Yayy You Won",200,1200);
 			}
 
 			scoreB = 0;
@@ -784,7 +783,7 @@ document.onkeydown = function(event){
 
 			game.context.fillStyle = "rgba(255,255,255,0.3)";
 			game.context.font = "40px Consolas"
-			game.context.fillText("Press Any Key to start a New Game",600,1400);
+			game.context.fillText("Press Any Key to start a New Game",200,1400);
 
 
 		}
